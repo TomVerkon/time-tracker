@@ -1,13 +1,15 @@
 # hour-tracker-electron
-Hour tracking for contract work, made in electron. Mostly designed as a test-project, but I'll be using it personally to track my own projects instead of paying for other ones. **VERY VERY** sketchy right now, don't recommend unless you want a supreme headache ;)
+Hour tracking for contract work, made in electron. Mostly designed as a test-project, but I'll be using it personally to track my own projects instead of paying for other ones. **VERY** much in beta, haven't even added logging in yet ;)
 
 ### For development
 
 For the main app:
 
-The usual `git clone $URL $DIRECTORY` and `yarn || npm install` then `yarn || npm start`.
+You'll need `electron-forge` primarily, most everything else is included with the package installation. I'll update the README if anything acts screwy.
 
-For the express server (will be more important after it actually _does_ something ;) ):
+Then the usual `git clone $URL $DIRECTORY` and `yarn || npm install` then `yarn || npm start`.
+
+For the express server (will be more important info here after it actually _does_ something ;) ):
 
 `cd $DIRECTORY/server` then `yarn || npm install` followed by `yarn || npm start`.
 
