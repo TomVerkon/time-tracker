@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
 </head>
 <body style="overflow: hidden; background-color: rgba(0,0,0,0); margin: 0" >
   <div id="App"></div>
@@ -10,10 +13,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
+import { createMemoryHistory } from "history";
+
+const initialState = window.__INITIAL_STATE__;
+const config = window.__CONFIG__;
+
+const history = createMemoryHistory("begin-path");
 
 const render = () => {
   const App = require('./app').default;
-  ReactDOM.render(<AppContainer><App /></AppContainer>, document.getElementById('App'));
+  ReactDOM.render(<AppContainer><App config={config} history={history} initialState={initialState} /></AppContainer>, document.getElementById('App'));
 }
 
 render();

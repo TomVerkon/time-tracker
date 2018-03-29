@@ -54,7 +54,12 @@
     "electron-squirrel-startup": "^1.0.0",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
-    "react-hot-loader": "^3.0.0-beta.6"
+    "react-hot-loader": "^3.0.0-beta.6",
+    "react-redux": "^5.0.7",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "redux": "^3.7.2",
+    "redux-saga": "^0.16.0"
   },
   "devDependencies": {
     "babel-plugin-transform-async-to-generator": "^6.24.1",
