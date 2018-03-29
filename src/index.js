@@ -1,20 +1,48 @@
-import { app, BrowserWindow, session } from 'electron'
+import { app, BrowserWindow, screen, Menu, Tray, nativeImage, ipcMain } from 'electron'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import { enableLiveReload } from 'electron-compile'
+import path from 'path'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+let tray
 
 const isDevMode = process.execPath.match(/[\\/]electron/)
 
 if (isDevMode) enableLiveReload({ strategy: 'react-hmr' })
 
-const createWindow = async () => {
+const main = async () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 300,
+    height: 300,
+    icon: path.join(__dirname, 'assets/icon32.png'),
+    show: false,
+    frame: false,
+    resizable: false,
+  })
+  // Setup the menubar with an icon
+  const icon = nativeImage.createFromPath(path.join(__dirname, 'assets/icon32.png'))
+  tray = new Tray(icon)
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Pause Timer', type: 'normal', click: () => {
+      console.log('Clicked item 1')
+    }},
+    { label: 'Item2', type: 'radio' }
+  ])
+  tray.setToolTip('Timer')
+  tray.setContextMenu(contextMenu)
+
+  // Add a click handler so that when the user clicks on the menubar icon, it shows
+  // our popup window
+  tray.on('click', function (event) {
+    toggleWindow()
+
+    // Show devtools when command clicked
+    if (mainWindow.isVisible() && process.defaultApp && event.metaKey) {
+      mainWindow.openDevTools({ mode: 'detach' })
+    }
   })
 
   // and load the index.html of the app.
@@ -22,7 +50,6 @@ const createWindow = async () => {
   // Open the DevTools.
   if (isDevMode) {
     await installExtension(REACT_DEVELOPER_TOOLS)
-    mainWindow.webContents.openDevTools()
   }
 
   // Emitted when the window is closed.
@@ -32,34 +59,51 @@ const createWindow = async () => {
     // when you should delete the corresponding element.
     mainWindow = null
   })
-  // ipc basically seems to be like the event emitters in Meteor.js, I.E. works be magic
-
-  const { ipcMain, session } = require('electron')
-  ipcMain.on('/get-cookies', (event, data) => {
-    event.sender.send('/get-cookies-reply', 'Hello from your electron process!')
-  })
-  ipcMain.on('storage-test', (event, data) => {
-    const storage = require('electron-json-storage')
-    storage.set('test', { foo: 'bar'}, (error) => {
-      if (error) {
-        console.error(error)
-      } else {
-        storage.get('test', (error, data) => {
-          if (error) {
-            console.error(error)
-          } else {
-            event.sender.send('storage-test-reply', data)
-          }
-        })
-      }
-    })
-  })
+  
+  // IPC 'routes' file
+  require('./routes')
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', main)
+
+const toggleWindow = () => {
+  if (mainWindow.isVisible()) {
+    mainWindow.hide()
+  } else {
+    showWindow()
+  }
+}
+
+const showWindow = () => {
+  console.log(process.platform)
+  let trayPos = tray.getBounds()
+  console.log(trayPos)
+  const windowPos = mainWindow.getBounds()
+  let x, y = 0
+  if (process.platform == 'darwin') {
+    x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2))
+    y = Math.round(trayPos.y + trayPos.height)
+  } else if (process.platform == 'linux'){
+    trayPos = screen.getCursorScreenPoint()
+    x = Math.round(trayPos.x - (windowPos.width / 2))
+    y = Math.round(trayPos.y)
+  } else {
+    x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2))
+    y = Math.round(trayPos.y + trayPos.height * 10)
+  }
+
+
+  mainWindow.setPosition(x, y, false)
+  mainWindow.show()
+  mainWindow.focus()
+}
+
+ipcMain.on('show-window', () => {
+  showWindow()
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
