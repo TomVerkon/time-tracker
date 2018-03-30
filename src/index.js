@@ -19,7 +19,7 @@ const main = async () => {
     height: 300,
     icon: path.join(__dirname, 'assets/icon32.png'),
     show: false,
-    frame: false,
+    frame: isDevMode,
     resizable: false,
   })
   // Setup the menubar with an icon
@@ -50,6 +50,7 @@ const main = async () => {
   // Open the DevTools.
   if (isDevMode) {
     await installExtension(REACT_DEVELOPER_TOOLS)
+    mainWindow.openDevTools({ mode: 'detach' })
   }
 
   // Emitted when the window is closed.
