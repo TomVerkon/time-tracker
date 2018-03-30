@@ -1,5 +1,5 @@
-# hour-tracker-electron
-Hour tracking for contract work, made in electron. Mostly designed as a test-project, but I'll be using it personally to track my own projects instead of paying for other ones. **VERY** much in beta, haven't even added logging in yet ;)
+# Time Tracker
+Hour tracking for contract work, made in Electron with React. Mostly designed as a test-project, but I'll be using it personally to track my own projects instead of paying for other ones.
 
 ### For development
 
