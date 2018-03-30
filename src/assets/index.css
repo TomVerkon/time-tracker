@@ -1,0 +1,9 @@
+/** 
+ * For some reason the <a/> tags weren't getting
+ * proper hover styles...
+ * This fixes that
+ */
+
+a:hover {
+  cursor: pointer;
+}
