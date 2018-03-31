@@ -6,6 +6,31 @@ console.log(env)
 
 const app = express()
 
+const WebSocketServer = require('ws').Server
+const wss = new WebSocketServer({ port: 40510 })
+
+function noop() { }
+function heartbeat() {
+  this.isAlive = true;
+}
+wss.on('connection', function (ws) {
+  console.log('Connected')
+  ws.isAlive = true
+  ws.on('pong', heartbeat);
+})
+setInterval(() => {
+  wss.clients.forEach(function each(ws) {
+    if (ws.isAlive === false) {
+      console.log('Terminating')
+      return ws.terminate()
+    }
+    ws.send(`${new Date()}`)
+
+    ws.isAlive = false;
+    ws.ping(noop)
+  })
+}, 1000)
+
 app.use(express.json())
 app.use(cookieSession({
   name: 'session',
