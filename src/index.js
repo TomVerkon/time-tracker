@@ -12,6 +12,63 @@ const isDevMode = process.execPath.match(/[\\/]electron/)
 
 if (isDevMode) enableLiveReload({ strategy: 'react-hmr' })
 
+const setupApplicationTray = (mainWindow) => {
+  // Setup the menubar with an icon
+  const icon = nativeImage.createFromPath(path.join(__dirname, 'assets/icon32.png'))
+  tray = new Tray(icon)
+
+  // Rendering Context Menu based on platform
+  console.log(process.platform)
+  let contextMenu
+  if (process.platform === 'darwin') {
+    contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Show timers',
+        type: 'normal',
+        click: () => {
+          showWindow()
+        }
+      },
+      {
+        label: 'Quit Application',
+        type: 'normal',
+        click: () => {
+          app.quit()
+        }
+      }
+    ])
+  } else {
+    contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Quit Application',
+        type: 'normal',
+        click: () => {
+          app.quit()
+        }
+      }
+    ])
+  }
+  tray.setToolTip('Timer')
+  tray.setContextMenu(contextMenu)
+
+  // Add a click handler so that when the user clicks on the menubar icon, it shows
+  // our popup window
+  tray.on('click', (event) => {
+    console.log('tray clicked')
+    if (process.platform !== 'darwin') {
+      toggleWindow()
+    } else {
+      mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
+    }
+
+    // Show devtools when command clicked
+    if (mainWindow.isVisible() && process.defaultApp && event.metaKey) {
+      mainWindow.openDevTools({ mode: 'detach' })
+    }
+  })
+
+}
+
 const main = async () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -21,30 +78,8 @@ const main = async () => {
     show: false,
     frame: isDevMode,
     resizable: false,
+    skipTaskbar: true,
   })
-  // Setup the menubar with an icon
-  const icon = nativeImage.createFromPath(path.join(__dirname, 'assets/icon32.png'))
-  tray = new Tray(icon)
-  const contextMenu = Menu.buildFromTemplate([
-    { label: 'Pause Timer', type: 'normal', click: () => {
-      console.log('Clicked item 1')
-    }},
-    { label: 'Item2', type: 'radio' }
-  ])
-  tray.setToolTip('Timer')
-  tray.setContextMenu(contextMenu)
-
-  // Add a click handler so that when the user clicks on the menubar icon, it shows
-  // our popup window
-  tray.on('click', function (event) {
-    toggleWindow()
-
-    // Show devtools when command clicked
-    if (mainWindow.isVisible() && process.defaultApp && event.metaKey) {
-      mainWindow.openDevTools({ mode: 'detach' })
-    }
-  })
-
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)
   // Open the DevTools.
@@ -52,19 +87,24 @@ const main = async () => {
     await installExtension(REACT_DEVELOPER_TOOLS)
     mainWindow.openDevTools({ mode: 'detach' })
   }
-
+  
   // Emitted when the window is closed.
-  mainWindow.on('closed', () => {
+  mainWindow.on('close', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow = null
+    mainWindow.hide()
   })
   
-  // mainWindow.on('blur', () => {
-  //   toggleWindow()
-  // })
+  mainWindow.on('blur', () => {
+    if (isDevMode) {
+      return undefined
+    }
+    mainWindow.hide()
+  })
 
+  // Setting up the tray icon, references above function
+  setupApplicationTray(mainWindow)
   // IPC 'routes' file
   require('./routes')
 }
@@ -75,10 +115,15 @@ const main = async () => {
 app.on('ready', main)
 
 const toggleWindow = () => {
+  console.log('visibility', mainWindow.isVisible())
   if (mainWindow.isVisible()) {
     mainWindow.hide()
   } else {
-    showWindow()
+    if (process.platform == 'darwin') {
+      mainWindow.show()
+    } else {
+      showWindow()
+    }
   }
 }
 
@@ -87,11 +132,12 @@ const showWindow = () => {
   let trayPos = tray.getBounds()
   console.log(trayPos)
   const windowPos = mainWindow.getBounds()
-  let x, y = 0
-  if (process.platform == 'darwin') {
+  let x = 0
+  let y = 0
+  if (process.platform === 'darwin') {
     x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2))
     y = Math.round(trayPos.y + trayPos.height)
-  } else if (process.platform == 'linux'){
+  } else if (process.platform === 'linux'){
     trayPos = screen.getCursorScreenPoint()
     x = Math.round(trayPos.x - (windowPos.width / 2))
     y = Math.round(trayPos.y)
