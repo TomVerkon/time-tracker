@@ -1,46 +1,59 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import Timer from './Timer'
 
-export default class TimerPage extends React.Component {
+class TimerPage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      timers: [
-        {
-          name: 'Timer 1',
-          value: '1:00:55',
-          project: 'Singing Men',
-          description: 'Adding user login'
-        },
-        {
-          name: 'Registration',
-          value: '1:00:55',
-          project: 'Client 2',
-          description: 'Adding user Registration'
-        }
-      ]
+      activeTab: 1,
     }
   }
   renderTimers() {
-    const timers = this.state.timers.map((timer) => {
+    const timers = this.props.timers.map((timer, index) => {
       return (
-        <Timer timer={timer} />
+        <Timer timer={timer} index={index} key={`${index}${timer.name}`} />
       )
     })
     return timers
   }
   render() {
     return (
-      <div>
-        <h3 style={{ marginTop: '10px' }}>Your Timers</h3>
-        <div style={{ overflowY: 'auto', paddingRight: '17px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '265px' }}>
+        <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-around' }}>
+          <h3 style={{ display: 'inline' }}>Your Timers</h3>
+          <button className="btn btn-primary">
+            <i className="icon icon-plus" />
+          </button>
+        </div>
+        <ul className="tab tab-block">
+          {/* Binary active tab status because there are only two */}
+          <li className={`tab-item ${this.state.activeTab ? 'active' : ''}`}>
+            <a onClick={() => this.setState({ activeTab: !this.state.activeTab })}>All Timers</a>
+          </li>
+          <li className={`tab-item ${this.state.activeTab ? '' : 'active'}`}>
+            <a onClick={() => this.setState({ activeTab: !this.state.activeTab })}>By Project</a>
+          </li>
+        </ul>
+        { this.state.activeTab ?
+        <div style={{ overflowY: 'auto', height: '205px', width: '99%' }}>
           {this.renderTimers()}
         </div>
-        <div>
-          <button className="btn btn-primary">Add Timer</button>
+        :
+        <div style={{ overflowY: 'auto', height: '205px', width: '99%' }}>
+          <p style={{ marginTop: '30px' }}>No Projects yet :(</p>
         </div>
+        }
       </div>
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    timers: state.timers
+  }
+}
+
+export default connect(mapStateToProps)(TimerPage)

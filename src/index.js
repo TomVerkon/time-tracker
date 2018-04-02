@@ -12,17 +12,7 @@ const isDevMode = process.execPath.match(/[\\/]electron/)
 
 if (isDevMode) enableLiveReload({ strategy: 'react-hmr' })
 
-const main = async () => {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 300,
-    height: 300,
-    icon: path.join(__dirname, 'assets/icon32.png'),
-    show: false,
-    frame: false,
-    resizable: false,
-    skipTaskbar: true,
-  })
+const setupApplicationTray = (mainWindow) => {
   // Setup the menubar with an icon
   const icon = nativeImage.createFromPath(path.join(__dirname, 'assets/icon32.png'))
   tray = new Tray(icon)
@@ -77,6 +67,19 @@ const main = async () => {
     }
   })
 
+}
+
+const main = async () => {
+  // Create the browser window.
+  mainWindow = new BrowserWindow({
+    width: 300,
+    height: 300,
+    icon: path.join(__dirname, 'assets/icon32.png'),
+    show: false,
+    frame: isDevMode,
+    resizable: false,
+    skipTaskbar: true,
+  })
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)
   // Open the DevTools.
@@ -84,7 +87,7 @@ const main = async () => {
     await installExtension(REACT_DEVELOPER_TOOLS)
     mainWindow.openDevTools({ mode: 'detach' })
   }
-
+  
   // Emitted when the window is closed.
   mainWindow.on('close', () => {
     // Dereference the window object, usually you would store windows
@@ -92,11 +95,16 @@ const main = async () => {
     // when you should delete the corresponding element.
     mainWindow.hide()
   })
-
+  
   mainWindow.on('blur', () => {
+    if (isDevMode) {
+      return undefined
+    }
     mainWindow.hide()
   })
 
+  // Setting up the tray icon, references above function
+  setupApplicationTray(mainWindow)
   // IPC 'routes' file
   require('./routes')
 }

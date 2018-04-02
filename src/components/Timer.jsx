@@ -1,13 +1,14 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
-export default class Timer extends React.Component {
+import { startTimer } from '../features/timerFunctions'
+
+class Timer extends React.Component {
   constructor(props) {
     super(props)
+    const timer = props.timer
     this.state = {
-      seconds: 0,
-      minutes: 0,
-      hours: 0,
-      timerActive: false
+      timerActive: timer.timerActive || false
     }
   }
   componentDidMount() {
@@ -19,62 +20,101 @@ export default class Timer extends React.Component {
       ws.send('connection')
     }
 
-    // event emmited when receiving message 
+    // event emmited when receiving message
     ws.onmessage = (res) => {
       ws.send('pong')
     }
-    this.timerHandler()
+    this.setTimerFromProps()
   }
-  timerHandler() {
-    let { timer } = this.props
-    if (timer) {
-      const splitTimes = timer.value.split(':')
-      console.log(splitTimes)
-    }
-    let interval = setInterval(() => {
-      if(this.state.timerActive) {
-        if (this.state.seconds++ < 59) {
-          // Setting Seconds
-          this.setState({
-            /* I have NO idea how this works, but it does
-             * on minutes too... There be dragons... */
-            seconds: this.state.seconds
-          })
-        } else {
-          // Setting minutes
-          if (this.state.minutes++ < 59) {
-            this.setState({
-              minutes: this.state.minutes,
-              seconds: 0
-            })
-          } else {
-            // Setting hours
-            this.setState({
-              hours: this.state.hours + 1,
-              minutes: 0,
-              seconds: 0
-            })
-          }
-        }
+  setTimerFromProps() {
+    const { value } = this.props.timer
+    this.setState({
+      hours: value.hours,
+      minutes: value.minutes,
+      seconds: value.seconds
+    })
+  }
+  startTimer() {
+    const { dispatch } = this.props
+    startTimer(this.props.timer, dispatch)
+  }
+  stopTimer() {
+    this.props.stopTimer(this.props.timer.interval)
+  }
+  stringifyTime() {
+    const hours = (this.props.timer.value.hours.toString().length === 1 ? `0${this.props.timer.value.hours}` : this.props.timer.value.hours)
+    const minutes = (this.props.timer.value.minutes.toString().length === 1 ? `0${this.props.timer.value.minutes}` : this.props.timer.value.minutes)
+    const seconds = (this.props.timer.value.seconds.toString().length === 1 ? `0${this.props.timer.value.seconds}` : this.props.timer.value.seconds)
+    if (this.state.hours !== 0) {
+      return {
+        time: `${hours}:${minutes}`,
+        tooltip: 'Hours : Minutes'
       }
-    }, 1000)
+    }
+    return {
+      time: `${minutes}:${seconds}`,
+      tooltip: 'Minutes : Seconds'
+    }
   }
   render() {
-    const hours = (this.state.hours.toString().length === 1 ? `0${this.state.hours}` : this.state.hours)
-    const minutes = (this.state.minutes.toString().length === 1 ? `0${this.state.minutes}` : this.state.minutes)
-    const seconds = (this.state.seconds.toString().length === 1 ? `0${this.state.seconds}` : this.state.seconds)
+    const timer = this.stringifyTime()
     return (
-      <div style={{ textAlign: 'left', padding: '5px' }}>
-        <div className="tile tile-centered">
+      <div style={{ textAlign: 'left', padding: '5px', marginBottom: '15px' }}>
+        <div className="tile">
           <div className="tile-content">
-            <h5 className="tile-title">{hours != 0 ? `${hours}:${minutes}` : `${minutes}:${seconds}`} - {this.props.name || 'Timer'}</h5>
-            <div className="tile-subtitle text-gray">14MB · Public · 1 Jan, 2017</div>
+            <h5 style={{ zIndex: `${this.props.index}` }} className="tile-title tooltip tooltip-bottom" data-tooltip={timer.tooltip}>{timer.time}</h5>
+            <div className="tile-subtitle text-gray">{this.props.timer.project}</div>
           </div>
           <div className="tile-action">
-            <button className="btn btn-error" onClick={() => this.setState({ timerActive: !this.state.timerActive })}>{this.state.timerActive ? 'Stop' : 'Start'}</button>
+            <div className="dropdown dropdown-right">
+              <span className="btn btn-link dropdown-toggle" tabIndex="0">
+                <i className="icon icon-caret" />
+              </span>
+              <ul style={{ marginBottom: '25px' }} className="menu">
+                <li style={{ cursor: 'pointer' }}>Test</li>
+                <li className="divider" />
+                <li style={{ cursor: 'pointer' }} className="text-error">Remove</li>
+              </ul>
+            </div>
+            <button className="btn btn-error" onClick={this.state.timerActive
+              ? () => {
+                this.setState({ timerActive: false })
+                this.stopTimer()
+              }
+              : () => {
+                this.setState({ timerActive: true })
+                this.startTimer()
+              }
+            }
+            >{this.state.timerActive ? 'Stop' : 'Start'}</button>
           </div>
         </div>
       </div>
     )
   }
 }
+const mapStateToProps = (state) => {
+  return { state }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+    updateTimer: (timerState, index) => {
+      dispatch({
+        type: 'UPDATE_TIMER',
+        payload: {
+          index,
+          timerState
+        }
+      })
+    },
+    stopTimer: (interval) => {
+      dispatch({
+        type: 'STOP_TIMER',
+        payload: { interval }
+      })
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Timer)
