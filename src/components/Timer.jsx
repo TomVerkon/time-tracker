@@ -45,7 +45,7 @@ class Timer extends React.Component {
     const hours = (this.props.timer.value.hours.toString().length === 1 ? `0${this.props.timer.value.hours}` : this.props.timer.value.hours)
     const minutes = (this.props.timer.value.minutes.toString().length === 1 ? `0${this.props.timer.value.minutes}` : this.props.timer.value.minutes)
     const seconds = (this.props.timer.value.seconds.toString().length === 1 ? `0${this.props.timer.value.seconds}` : this.props.timer.value.seconds)
-    if (this.state.hours !== 0) {
+    if (this.props.timer.value.hours !== 0) {
       return {
         time: `${hours}:${minutes}`,
         tooltip: 'Hours : Minutes'

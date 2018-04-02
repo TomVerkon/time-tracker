@@ -4,10 +4,10 @@ export function stopTimer(interval) {
 export function startTimer(timerState, dispatch) {
   const timer = timerState
   const interval = setInterval(() => {
-    if (timer.value.seconds + 1 < 59) {
+    if (timer.value.seconds + 1 < 60) {
       timer.value.seconds += 1
     } else {
-      if (timer.value.minutes + 1 < 59) {
+      if (timer.value.minutes + 1 < 60) {
         timer.value.seconds = 0
         timer.value.minutes += 1
       } else {
@@ -16,7 +16,6 @@ export function startTimer(timerState, dispatch) {
         timer.value.hours += 1
       }
     }
-    // console.log(timer)
     dispatch({
       type: 'UPDATE_TIMER',
       payload: { timer }
