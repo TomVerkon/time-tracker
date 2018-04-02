@@ -41,7 +41,6 @@ export function timerReducer(state = tempStore, action) {
     case 'UPDATE_TIMER':
       currentState = state
       currentState[action.payload.timer.index] = action.payload.timer
-      console.log(currentState)
       return [...currentState]
     case 'REMOVE_TIMER':
       currentState = state
