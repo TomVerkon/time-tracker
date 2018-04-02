@@ -1,84 +1,17 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import Timer from './Timer'
 
-export default class TimerPage extends React.Component {
+class TimerPage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       activeTab: 1,
-      timers: [
-        {
-          name: 'Add Front Page',
-          value: {
-            hours: 0,
-            minutes: 59,
-            seconds: 55
-          },
-          project: 'Example Project',
-          description: 'Adding user login'
-        },
-        {
-          name: 'Add Front Page',
-          value: {
-            hours: 0,
-            minutes: 59,
-            seconds: 55
-          },
-          project: 'Example Project',
-          description: 'Adding user login'
-        },
-        {
-          name: 'Add Front Page',
-          value: {
-            hours: 0,
-            minutes: 59,
-            seconds: 55
-          },
-          project: 'Example Project',
-          description: 'Adding user login'
-        },
-        {
-          name: 'Add Front Page',
-          value: {
-            hours: 0,
-            minutes: 59,
-            seconds: 55
-          },
-          project: 'Example Project',
-          description: 'Adding user login'
-        },
-        {
-          name: 'Add Front Page',
-          value: {
-            hours: 0,
-            minutes: 59,
-            seconds: 55
-          },
-          project: 'Example Project',
-          description: 'Adding user login'
-        },
-        {
-          name: 'Add Front Page',
-          value: {
-            hours: 0,
-            minutes: 59,
-            seconds: 55
-          },
-          project: 'Example Project',
-          description: 'Adding user login'
-        },
-        // {
-        //   name: 'Registration',
-        //   value: '1:0:55',
-        //   project: 'Client 2',
-        //   description: 'Adding user Registration'
-        // }
-      ]
     }
   }
   renderTimers() {
-    const timers = this.state.timers.map((timer, index) => {
+    const timers = this.props.timers.map((timer, index) => {
       return (
         <Timer timer={timer} index={index} key={`${index}${timer.name}`} />
       )
@@ -116,3 +49,11 @@ export default class TimerPage extends React.Component {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    timers: state.timers
+  }
+}
+
+export default connect(mapStateToProps)(TimerPage)
