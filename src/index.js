@@ -18,7 +18,6 @@ const setupApplicationTray = (mainWindow) => {
   tray = new Tray(icon)
 
   // Rendering Context Menu based on platform
-  console.log(process.platform)
   let contextMenu
   if (process.platform === 'darwin') {
     contextMenu = Menu.buildFromTemplate([
@@ -54,7 +53,6 @@ const setupApplicationTray = (mainWindow) => {
   // Add a click handler so that when the user clicks on the menubar icon, it shows
   // our popup window
   tray.on('click', (event) => {
-    console.log('tray clicked')
     if (process.platform !== 'darwin') {
       toggleWindow()
     } else {
@@ -66,7 +64,6 @@ const setupApplicationTray = (mainWindow) => {
       mainWindow.openDevTools({ mode: 'detach' })
     }
   })
-
 }
 
 const main = async () => {
@@ -87,15 +84,15 @@ const main = async () => {
     await installExtension(REACT_DEVELOPER_TOOLS)
     mainWindow.openDevTools({ mode: 'detach' })
   }
-  
+
   // Emitted when the window is closed.
-  mainWindow.on('close', () => {
+  mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow.hide()
+    mainWindow = null
   })
-  
+
   mainWindow.on('blur', () => {
     if (isDevMode) {
       return undefined
@@ -105,8 +102,8 @@ const main = async () => {
 
   // Setting up the tray icon, references above function
   setupApplicationTray(mainWindow)
-  // IPC 'routes' file
-  require('./routes')
+  // IPC  Handlers for local storage file
+  require('./storageHandlers')
 }
 
 // This method will be called when Electron has finished
@@ -115,11 +112,10 @@ const main = async () => {
 app.on('ready', main)
 
 const toggleWindow = () => {
-  console.log('visibility', mainWindow.isVisible())
   if (mainWindow.isVisible()) {
     mainWindow.hide()
   } else {
-    if (process.platform == 'darwin') {
+    if (process.platform === 'darwin') {
       mainWindow.show()
     } else {
       showWindow()
@@ -128,9 +124,7 @@ const toggleWindow = () => {
 }
 
 const showWindow = () => {
-  console.log(process.platform)
   let trayPos = tray.getBounds()
-  console.log(trayPos)
   const windowPos = mainWindow.getBounds()
   let x = 0
   let y = 0
@@ -165,13 +159,13 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow()
-  }
-})
+// app.on('activate', () => {
+//   // On OS X it's common to re-create a window in the app when the
+//   // dock icon is clicked and there are no other windows open.
+//   if (mainWindow === null) {
+//     createWindow()
+//   }
+// })
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.

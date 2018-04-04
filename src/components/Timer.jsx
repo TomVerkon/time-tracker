@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { startTimer } from '../features/timerFunctions'
+import { startTimer, stopTimer, deleteTimer } from '../features/timerFunctions'
 
 class Timer extends React.Component {
   constructor(props) {
@@ -35,11 +35,18 @@ class Timer extends React.Component {
     })
   }
   startTimer() {
-    const { dispatch } = this.props
-    startTimer(this.props.timer, dispatch)
+    const { timer, dispatch, index } = this.props
+    // TODO: replace '12' with userId if user is valid
+    startTimer(12, timer, dispatch, index)
   }
   stopTimer() {
-    this.props.stopTimer(this.props.timer.interval)
+    const { timer, dispatch, index } = this.props
+    stopTimer(12, timer, dispatch, index, timer.interval)
+  }
+  deleteTimer() {
+    // TODO: add user info here
+    const { index, dispatch, timer } = this.props
+    deleteTimer(12, index, dispatch, timer.interval)
   }
   stringifyTime() {
     const hours = (this.props.timer.value.hours.toString().length === 1 ? `0${this.props.timer.value.hours}` : this.props.timer.value.hours)
@@ -62,7 +69,7 @@ class Timer extends React.Component {
       <div style={{ textAlign: 'left', padding: '5px', marginBottom: '15px' }}>
         <div className="tile">
           <div className="tile-content">
-            <h5 style={{ zIndex: `${this.props.index}` }} className="tile-title tooltip tooltip-bottom" data-tooltip={timer.tooltip}>{timer.time}</h5>
+            <h5 style={{ zIndex: `${this.props.index}` }} className="tile-title tooltip tooltip-bottom" data-tooltip={timer.tooltip}>{timer.time} - {this.props.timer.name}</h5>
             <div className="tile-subtitle text-gray">{this.props.timer.project}</div>
           </div>
           <div className="tile-action">
@@ -73,7 +80,12 @@ class Timer extends React.Component {
               <ul style={{ marginBottom: '25px' }} className="menu">
                 <li style={{ cursor: 'pointer' }}>Test</li>
                 <li className="divider" />
-                <li style={{ cursor: 'pointer' }} className="text-error">Remove</li>
+                <li onClick={() => {
+                  this.deleteTimer()
+                }}
+                  style={{ cursor: 'pointer' }}
+                  className="text-error"
+                >Remove</li>
               </ul>
             </div>
             <button className="btn btn-error" onClick={this.state.timerActive
@@ -106,12 +118,6 @@ const mapDispatchToProps = (dispatch) => {
           index,
           timerState
         }
-      })
-    },
-    stopTimer: (interval) => {
-      dispatch({
-        type: 'STOP_TIMER',
-        payload: { interval }
       })
     }
   }
