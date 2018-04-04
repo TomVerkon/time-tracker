@@ -15,4 +15,4 @@ For the express server (will be more important info here after it actually _does
 
 ### For releases
 
-No releases yet, should be easy-to-use packages though (i.e. `.exe`, `.dmg`, `.deb or .rpm`). Give the project a watch on Github if you want to wait for a release.
+See [The release timeline](https://github.com/time-tracker/time-tracker/releases) for specifics, but I've currently got binaries out for Debian-Based Linux and OSX. I plan to have Windows support soon, but it hasn't been as critical for as getting solid base features developed :)
