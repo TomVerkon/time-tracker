@@ -78,8 +78,6 @@ class Timer extends React.Component {
                 <i className="icon icon-caret" />
               </span>
               <ul style={{ marginBottom: '25px' }} className="menu">
-                <li style={{ cursor: 'pointer' }}>Test</li>
-                <li className="divider" />
                 <li onClick={() => {
                   this.deleteTimer()
                 }}
