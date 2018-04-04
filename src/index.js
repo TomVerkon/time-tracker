@@ -73,7 +73,7 @@ const main = async () => {
     height: 300,
     icon: path.join(__dirname, 'assets/icon32.png'),
     show: false,
-    frame: isDevMode,
+    frame: false,
     resizable: false,
     skipTaskbar: true,
   })
