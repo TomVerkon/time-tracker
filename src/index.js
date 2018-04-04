@@ -128,18 +128,21 @@ const showWindow = () => {
   const windowPos = mainWindow.getBounds()
   let x = 0
   let y = 0
+
+  // Any of these will break if the taskbar is not in a usual position
+  // TODO: Figure out how to fix position in weird taskbar locations
   if (process.platform === 'darwin') {
     x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2))
     y = Math.round(trayPos.y + trayPos.height)
-  } else if (process.platform === 'linux'){
+  } else if (process.platform === 'linux') {
     trayPos = screen.getCursorScreenPoint()
     x = Math.round(trayPos.x - (windowPos.width / 2))
     y = Math.round(trayPos.y)
   } else {
     x = Math.round(trayPos.x + (trayPos.width / 2) - (windowPos.width / 2))
-    y = Math.round(trayPos.y + trayPos.height * 10)
+    // This sets the window just on top of a bottom taskbar
+    y = Math.round(trayPos.y - (windowPos.height))
   }
-
 
   mainWindow.setPosition(x, y, false)
   mainWindow.show()
