@@ -60,6 +60,7 @@
         "multiline": true,
         "minProperties": 4
       }
-    ]
+    ],
+    "linebreak-style": 0
   }
 }
