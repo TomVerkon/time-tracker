@@ -7,6 +7,7 @@ import Home from './components/Home'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import TimerPage from './components/TimerPage'
+import ApplicationModal from './components/ApplicationModal'
 
 
 const App = (props) => {
@@ -19,6 +20,7 @@ const App = (props) => {
             <Route path="/login" component={Login} />
             <Route path="/signup" component={Signup} />
             <Route path="/timers" component={TimerPage} />
+            <ApplicationModal />
           </div>
         </Router>
         {/* <div style={{ display: 'fixed', position: 'absolute', bottom: '0' }} className="toast toast-error">
