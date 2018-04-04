@@ -1,7 +1,7 @@
 {
   "name": "time-tracker",
   "productName": "time-tracker",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
@@ -37,8 +37,9 @@
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
       "github_repository": {
-        "owner": "",
-        "name": ""
+        "prerelease": true,
+        "owner": "time_tracker",
+        "name": "time_tracker"
       },
       "windowsStoreConfig": {
         "packageName": "",
